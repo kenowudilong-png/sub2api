@@ -9,6 +9,9 @@ on:
 
 env:
   UPSTREAM_REPO: ${{ vars.YESYEAH_UPSTREAM_REPO || 'Wei-Shaw/sub2api' }}
+  IMAGE_PLATFORMS: ${{ vars.YESYEAH_IMAGE_PLATFORMS || 'linux/amd64' }}
+  BUILD_GOPROXY: ${{ vars.YESYEAH_BUILD_GOPROXY || 'https://proxy.golang.org,direct' }}
+  BUILD_GOSUMDB: ${{ vars.YESYEAH_BUILD_GOSUMDB || 'sum.golang.org' }}
 
 jobs:
   docker:
@@ -70,7 +73,7 @@ jobs:
         with:
           context: .
           file: ./deploy/Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: ${{ env.IMAGE_PLATFORMS }}
           push: true
           provenance: false
           tags: ${{ steps.meta.outputs.tags }}
@@ -78,6 +81,8 @@ jobs:
             VERSION=${{ steps.meta.outputs.version }}
             COMMIT=${{ github.sha }}
             DATE=${{ steps.meta.outputs.build_date }}
+            GOPROXY=${{ env.BUILD_GOPROXY }}
+            GOSUMDB=${{ env.BUILD_GOSUMDB }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           labels: |
@@ -90,11 +95,17 @@ jobs:
           IMAGE: ${{ steps.meta.outputs.image }}
           TAGS: ${{ steps.meta.outputs.tags }}
           UPSTREAM_TAG: ${{ steps.meta.outputs.upstream_tag }}
+          IMAGE_PLATFORMS: ${{ env.IMAGE_PLATFORMS }}
+          BUILD_GOPROXY: ${{ env.BUILD_GOPROXY }}
+          BUILD_GOSUMDB: ${{ env.BUILD_GOSUMDB }}
         run: |
           {
             echo "## YesYeah Theme Image"
             echo
             echo "- Image: \`${IMAGE}\`"
+            echo "- Platforms: \`${IMAGE_PLATFORMS}\`"
+            echo "- GOPROXY: \`${BUILD_GOPROXY}\`"
+            echo "- GOSUMDB: \`${BUILD_GOSUMDB}\`"
             echo "- Tags:"
             while IFS= read -r line; do
               [[ -n "${line}" ]] && echo "  - \`${line}\`"

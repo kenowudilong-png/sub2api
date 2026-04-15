@@ -25,6 +25,17 @@
 
 ## 推荐升级流程
 
+优先推荐 fork + GHCR 镜像更新：
+
+```bash
+cd /opt/sub2api-deploy
+/opt/sub2api/deploy/update_yesyeah_image.sh
+```
+
+这个脚本会按 `.env` 中的 `SUB2API_IMAGE` 拉取品牌镜像、重建容器，并在健康检查失败时自动回滚。
+
+只有在 GitHub Actions / GHCR 暂时不可用时，才退回到服务器源码树本地构建：
+
 ```bash
 cd /opt/sub2api
 git checkout yesyeah-theme
