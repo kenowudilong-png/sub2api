@@ -1,0 +1,21 @@
+name: YesYeah Build Theme Image
+
+on:
+  push:
+    branches:
+      - yesyeah-theme
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: yesyeah-build-theme-image
+  cancel-in-progress: true
+
+jobs:
+  build:
+    uses: ./.github/workflows/yesyeah-theme-image-reusable.yml
+    with:
+      checkout_ref: ${{ github.sha }}

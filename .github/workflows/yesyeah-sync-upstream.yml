@@ -1,0 +1,172 @@
+name: YesYeah Sync Upstream
+
+on:
+  schedule:
+    - cron: '23 3 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Run without pushing branch updates'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+  packages: write
+
+concurrency:
+  group: yesyeah-sync-upstream
+  cancel-in-progress: false
+
+env:
+  UPSTREAM_REPO: ${{ vars.YESYEAH_UPSTREAM_REPO || 'Wei-Shaw/sub2api' }}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    outputs:
+      manual_needed: ${{ steps.sync.outputs.manual_needed }}
+      updated: ${{ steps.sync.outputs.updated }}
+      main_sha: ${{ steps.sync.outputs.main_sha }}
+      theme_sha: ${{ steps.sync.outputs.theme_sha }}
+
+    steps:
+      - name: Checkout theme branch
+        uses: actions/checkout@v6
+        with:
+          ref: yesyeah-theme
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync branches
+        id: sync
+        env:
+          DRY_RUN: ${{ github.event.inputs.dry_run == 'true' }}
+        run: |
+          set -euo pipefail
+
+          git remote add upstream "https://github.com/${UPSTREAM_REPO}.git" 2>/dev/null || true
+          git fetch upstream main --tags
+          git fetch origin main yesyeah-theme
+
+          git checkout -B main upstream/main
+          main_sha="$(git rev-parse HEAD)"
+
+          if [[ "${DRY_RUN}" != "true" ]]; then
+            git push origin main --force-with-lease
+          fi
+
+          git checkout yesyeah-theme
+          before_sha="$(git rev-parse HEAD)"
+
+          set +e
+          git merge --no-ff --no-edit upstream/main
+          merge_status=$?
+          set -e
+
+          if [[ ${merge_status} -ne 0 ]]; then
+            conflict_files="$(git diff --name-only --diff-filter=U || true)"
+            git merge --abort || true
+            {
+              echo "manual_needed=true"
+              echo "main_sha=${main_sha}"
+              echo "conflicts<<EOF"
+              printf '%s\n' "${conflict_files}"
+              echo "EOF"
+            } >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          after_sha="$(git rev-parse HEAD)"
+          updated="false"
+
+          if [[ "${before_sha}" != "${after_sha}" ]]; then
+            updated="true"
+            if [[ "${DRY_RUN}" != "true" ]]; then
+              git push origin yesyeah-theme
+            fi
+          fi
+
+          {
+            echo "manual_needed=false"
+            echo "updated=${updated}"
+            echo "main_sha=${main_sha}"
+            echo "theme_sha=${after_sha}"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Create or update conflict issue
+        if: steps.sync.outputs.manual_needed == 'true'
+        uses: actions/github-script@v8
+        env:
+          CONFLICTS: ${{ steps.sync.outputs.conflicts }}
+        with:
+          script: |
+            const title = 'YesYeah upstream sync needs manual conflict resolution';
+            const body = [
+              'The scheduled upstream sync could not merge `upstream/main` into `yesyeah-theme`.',
+              '',
+              `Upstream main: \`${{ steps.sync.outputs.main_sha }}\``,
+              '',
+              'Conflicting files:',
+              '```text',
+              (process.env.CONFLICTS || '').trim() || '(none reported)',
+              '```',
+              '',
+              'Resolve the conflicts on `yesyeah-theme`, push the branch, then rerun `YesYeah Sync Upstream`.',
+            ].join('\n');
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'upstream-sync-conflict',
+            });
+            if (issues.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issues[0].number,
+                body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['upstream-sync-conflict'],
+              });
+            }
+
+      - name: Fail on merge conflict
+        if: steps.sync.outputs.manual_needed == 'true'
+        run: exit 1
+
+      - name: Job summary
+        run: |
+          {
+            echo "## YesYeah Upstream Sync"
+            echo
+            echo "- Upstream: \`${UPSTREAM_REPO}\`"
+            echo "- Updated fork main to: \`${{ steps.sync.outputs.main_sha }}\`"
+            if [[ "${{ steps.sync.outputs.manual_needed }}" == "true" ]]; then
+              echo "- Result: manual conflict resolution required"
+            elif [[ "${{ steps.sync.outputs.updated }}" == "true" ]]; then
+              echo "- Result: yesyeah-theme merged and pushed"
+              echo "- Theme head: \`${{ steps.sync.outputs.theme_sha }}\`"
+            else
+              echo "- Result: already up to date"
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+  build_theme_image:
+    needs: sync
+    if: needs.sync.outputs.manual_needed != 'true' && needs.sync.outputs.updated == 'true' && github.event.inputs.dry_run != 'true'
+    uses: ./.github/workflows/yesyeah-theme-image-reusable.yml
+    with:
+      checkout_ref: ${{ needs.sync.outputs.theme_sha }}
