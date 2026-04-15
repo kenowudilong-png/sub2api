@@ -5,7 +5,13 @@ import Toast from '@/components/common/Toast.vue'
 import NavigationProgress from '@/components/common/NavigationProgress.vue'
 import { resolveDocumentTitle } from '@/router/title'
 import AnnouncementPopup from '@/components/common/AnnouncementPopup.vue'
-import { useAppStore, useAuthStore, useSubscriptionStore, useAnnouncementStore } from '@/stores'
+import {
+  useAppStore,
+  useAuthStore,
+  useSubscriptionStore,
+  useAnnouncementStore,
+  useAdminUpdateNoticeStore
+} from '@/stores'
 import { getSetupStatus } from '@/api/setup'
 
 const router = useRouter()
@@ -14,6 +20,7 @@ const appStore = useAppStore()
 const authStore = useAuthStore()
 const subscriptionStore = useSubscriptionStore()
 const announcementStore = useAnnouncementStore()
+const adminUpdateNoticeStore = useAdminUpdateNoticeStore()
 
 /**
  * Update favicon dynamically
@@ -46,6 +53,9 @@ watch(
 function onVisibilityChange() {
   if (document.visibilityState === 'visible' && authStore.isAuthenticated) {
     announcementStore.fetchAnnouncements()
+    if (authStore.isAdmin) {
+      adminUpdateNoticeStore.fetchNotice()
+    }
   }
 }
 
@@ -68,12 +78,17 @@ watch(
         announcementStore.fetchAnnouncements()
       }
 
+      if (authStore.isAdmin) {
+        adminUpdateNoticeStore.fetchNotice(oldValue === false)
+      }
+
       // Register visibility change listener
       document.addEventListener('visibilitychange', onVisibilityChange)
     } else {
       // User logged out: clear data and stop polling
       subscriptionStore.clear()
       announcementStore.reset()
+      adminUpdateNoticeStore.reset()
       document.removeEventListener('visibilitychange', onVisibilityChange)
     }
   },
@@ -84,6 +99,9 @@ watch(
 router.afterEach(() => {
   if (authStore.isAuthenticated) {
     announcementStore.fetchAnnouncements()
+    if (authStore.isAdmin) {
+      adminUpdateNoticeStore.fetchNotice()
+    }
   }
 })
 

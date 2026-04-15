@@ -5042,6 +5042,7 @@ export default {
   // Announcements Page
   announcements: {
     title: '公告',
+    updateLabel: '版本更新',
     description: '查看系统公告',
     unreadOnly: '仅显示未读',
     markRead: '标记已读',
@@ -5060,7 +5061,15 @@ export default {
     total: '条公告',
     emptyDescription: '暂时没有任何系统公告',
     readStatus: '您已阅读此公告',
-    markReadHint: '点击"已读"标记此公告'
+    markReadHint: '点击"已读"标记此公告',
+    updateAvailableTitle: '发现上游新版本 v{version}',
+    currentVersionLabel: '当前版本',
+    latestVersionLabel: '上游版本',
+    updateSourceHint: '当前站点运行的是品牌源码镜像，请同步 fork 并重建 YesYeah 镜像后再部署。',
+    updateReleaseHint: '当前站点支持内置更新，可在左下角版本面板查看详情或直接执行更新。',
+    viewReleaseNotes: '查看发布说明',
+    updateReadStatus: '此版本提醒已处理；当上游再发布新版本时，会再次提醒。',
+    updateMarkReadHint: '标记后会隐藏当前版本提醒；新版本发布时会再次提醒。'
   },
 
   // User Subscriptions Page
