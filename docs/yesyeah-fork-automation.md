@@ -46,13 +46,8 @@
 4. 启用 Actions 和 Packages 权限
 5. 可选地创建仓库变量：
    - `YESYEAH_UPSTREAM_REPO=Wei-Shaw/sub2api`
-   - `YESYEAH_IMAGE_PLATFORMS=linux/amd64`
-   - `YESYEAH_BUILD_GOPROXY=https://proxy.golang.org,direct`
-   - `YESYEAH_BUILD_GOSUMDB=sum.golang.org`
 
 这套 workflow 默认只使用 `GITHUB_TOKEN`，不要求额外配置 GHCR PAT。
-
-如果 VPS 需要匿名拉取镜像，第一次成功推送后还要确认 GHCR 包 `sub2api` 为 public；如果暂时不公开，则在 VPS 上先执行一次 `docker login ghcr.io`。
 
 ## VPS 侧需要做的事
 
@@ -80,7 +75,7 @@ cd /opt/sub2api-deploy
 这时的实际效果会是：
 
 - GitHub Actions 夜间同步 upstream
-- 无冲突时自动构建新的 `yesyeah-theme` 镜像（默认只产出 VPS 需要的 `linux/amd64`）
+- 无冲突时自动构建新的 `yesyeah-theme` 镜像
 - VPS 凌晨定时拉取新镜像并做健康检查
 - landing 保持在宿主机目录，不会被容器覆盖
 
