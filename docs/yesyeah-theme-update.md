@@ -7,8 +7,6 @@
 
 这样做的目的，是把“首页 landing”和“控制台主题”都从官方默认产物里拆出来，避免后续升级时被直接覆盖。
 
-如果后续要走 fork 自动同步方案，补充说明见 [yesyeah-fork-automation.md](/Users/a/Documents/api中转/sub2api/docs/yesyeah-fork-automation.md)。
-
 ## 哪些内容不会被覆盖
 
 - `/var/www/yesyeah-landing` 下的首页静态文件
