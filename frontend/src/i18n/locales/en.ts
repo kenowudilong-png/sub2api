@@ -4880,7 +4880,6 @@ export default {
   // Announcements Page
   announcements: {
     title: 'Announcements',
-    updateLabel: 'Updates',
     description: 'View system announcements',
     unreadOnly: 'Show unread only',
     markRead: 'Mark as read',
@@ -4899,15 +4898,7 @@ export default {
     total: 'announcements',
     emptyDescription: 'There are no system announcements at this time',
     readStatus: 'You have read this announcement',
-    markReadHint: 'Click "Mark as read" to mark this announcement',
-    updateAvailableTitle: 'New upstream version detected: v{version}',
-    currentVersionLabel: 'Current version',
-    latestVersionLabel: 'Upstream version',
-    updateSourceHint: 'This site is running a branded source image. Sync the fork and rebuild the YesYeah image before deployment.',
-    updateReleaseHint: 'This site supports built-in updates. Open the version panel in the lower-left corner to review or apply the update.',
-    viewReleaseNotes: 'View release notes',
-    updateReadStatus: 'This release notice has been handled. A new one will appear when the next upstream version is published.',
-    updateMarkReadHint: 'Marking this as read hides the current release notice. It will reappear for the next upstream release.'
+    markReadHint: 'Click "Mark as read" to mark this announcement'
   },
 
   // User Subscriptions Page

@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- 铃铛按钮 -->
     <button
       @click="openModal"
       class="relative flex h-9 w-9 items-center justify-center rounded-lg text-gray-600 transition-all hover:bg-gray-100 hover:scale-105 dark:text-gray-400 dark:hover:bg-dark-800"
@@ -7,12 +8,17 @@
       :aria-label="t('announcements.title')"
     >
       <Icon name="bell" size="md" />
-      <span v-if="unreadCount > 0" class="absolute right-1 top-1 flex h-2 w-2">
+      <!-- 未读红点 -->
+      <span
+        v-if="unreadCount > 0"
+        class="absolute right-1 top-1 flex h-2 w-2"
+      >
         <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
         <span class="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
       </span>
     </button>
 
+    <!-- 公告列表 Modal -->
     <Teleport to="body">
       <Transition name="modal-fade">
         <div
@@ -24,6 +30,7 @@
             class="w-full max-w-[620px] overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5 dark:bg-dark-800 dark:ring-white/10"
             @click.stop
           >
+            <!-- Header with Gradient -->
             <div class="relative overflow-hidden border-b border-gray-100/80 bg-gradient-to-br from-blue-50/50 to-indigo-50/30 px-6 py-5 dark:border-dark-700/50 dark:from-blue-900/10 dark:to-indigo-900/5">
               <div class="relative z-10 flex items-start justify-between">
                 <div>
@@ -58,10 +65,13 @@
                   </button>
                 </div>
               </div>
+              <!-- Decorative gradient -->
               <div class="absolute right-0 top-0 h-full w-48 bg-gradient-to-l from-indigo-100/20 to-transparent dark:from-indigo-900/10"></div>
             </div>
 
+            <!-- Body -->
             <div class="max-h-[65vh] overflow-y-auto">
+              <!-- Loading -->
               <div v-if="loading" class="flex items-center justify-center py-16">
                 <div class="relative">
                   <div class="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600 dark:border-dark-600 dark:border-t-blue-400"></div>
@@ -69,43 +79,26 @@
                 </div>
               </div>
 
-              <div v-else-if="notificationItems.length > 0">
+              <!-- Announcements List -->
+              <div v-else-if="announcements.length > 0">
                 <div
-                  v-for="item in notificationItems"
+                  v-for="item in announcements"
                   :key="item.id"
                   class="group relative flex items-center gap-4 border-b border-gray-100 px-6 py-4 transition-all hover:bg-gray-50 dark:border-dark-700 dark:hover:bg-dark-700/30"
-                  :class="getRowClasses(item)"
+                  :class="{ 'bg-blue-50/30 dark:bg-blue-900/5': !item.read_at }"
                   style="min-height: 72px"
                   @click="openDetail(item)"
                 >
+                  <!-- Status Indicator -->
                   <div class="flex h-10 w-10 flex-shrink-0 items-center justify-center">
                     <div
                       v-if="!item.read_at"
-                      class="relative flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-lg"
-                      :class="getUnreadIconClasses(item)"
+                      class="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30"
                     >
-                      <span
-                        class="absolute inline-flex h-full w-full animate-ping rounded-xl opacity-75"
-                        :class="getUnreadPulseClasses(item)"
-                      ></span>
-                      <svg
-                        v-if="item.kind === 'update'"
-                        class="relative z-10 h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2.2"
-                      >
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
-                      <svg
-                        v-else
-                        class="relative z-10 h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                      >
+                      <!-- Pulse ring -->
+                      <span class="absolute inline-flex h-full w-full animate-ping rounded-xl bg-blue-400 opacity-75"></span>
+                      <!-- Icon -->
+                      <svg class="relative z-10 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
@@ -119,41 +112,30 @@
                     </div>
                   </div>
 
+                  <!-- Content -->
                   <div class="flex min-w-0 flex-1 items-center justify-between gap-4">
                     <div class="min-w-0 flex-1">
                       <h3 class="truncate text-sm font-medium text-gray-900 dark:text-white">
                         {{ item.title }}
                       </h3>
-                      <div class="mt-1 flex flex-wrap items-center gap-2">
-                        <span
-                          class="inline-flex items-center rounded-md px-1.5 py-0.5 text-[11px] font-medium"
-                          :class="getKindBadgeClasses(item)"
-                        >
-                          {{ getKindLabel(item) }}
-                        </span>
+                      <div class="mt-1 flex items-center gap-2">
                         <time class="text-xs text-gray-500 dark:text-gray-400">
                           {{ formatRelativeTime(item.created_at) }}
                         </time>
                         <span
                           v-if="!item.read_at"
-                          class="inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-xs font-medium"
-                          :class="getUnreadBadgeClasses(item)"
+                          class="inline-flex items-center gap-1 rounded-md bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300"
                         >
                           <span class="relative flex h-1.5 w-1.5">
-                            <span
-                              class="absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
-                              :class="item.kind === 'update' ? 'bg-amber-500' : 'bg-blue-500'"
-                            ></span>
-                            <span
-                              class="relative inline-flex h-1.5 w-1.5 rounded-full"
-                              :class="item.kind === 'update' ? 'bg-amber-600' : 'bg-blue-600'"
-                            ></span>
+                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-500 opacity-75"></span>
+                            <span class="relative inline-flex h-1.5 w-1.5 rounded-full bg-blue-600"></span>
                           </span>
                           {{ t('announcements.unread') }}
                         </span>
                       </div>
                     </div>
 
+                    <!-- Arrow -->
                     <div class="flex-shrink-0">
                       <svg
                         class="h-5 w-5 text-gray-400 transition-transform group-hover:translate-x-1 dark:text-gray-600"
@@ -167,14 +149,15 @@
                     </div>
                   </div>
 
+                  <!-- Unread indicator bar -->
                   <div
                     v-if="!item.read_at"
-                    class="absolute left-0 top-0 h-full w-1"
-                    :class="item.kind === 'update' ? 'bg-gradient-to-b from-amber-500 to-orange-600' : 'bg-gradient-to-b from-blue-500 to-indigo-600'"
+                    class="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-blue-500 to-indigo-600"
                   ></div>
                 </div>
               </div>
 
+              <!-- Empty State -->
               <div v-else class="flex flex-col items-center justify-center py-16">
                 <div class="relative mb-4">
                   <div class="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-dark-700 dark:to-dark-600">
@@ -195,10 +178,11 @@
       </Transition>
     </Teleport>
 
+    <!-- 公告详情 Modal -->
     <Teleport to="body">
       <Transition name="modal-fade">
         <div
-          v-if="detailModalOpen && selectedNotification"
+          v-if="detailModalOpen && selectedAnnouncement"
           class="fixed inset-0 z-[110] flex items-start justify-center overflow-y-auto bg-gradient-to-br from-black/70 via-black/60 to-black/70 p-4 pt-[6vh] backdrop-blur-md"
           @click="closeDetail"
         >
@@ -206,70 +190,29 @@
             class="w-full max-w-[780px] overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5 dark:bg-dark-800 dark:ring-white/10"
             @click.stop
           >
-            <div
-              class="relative overflow-hidden border-b px-8 py-6"
-              :class="selectedNotification.kind === 'update'
-                ? 'border-amber-100 bg-gradient-to-br from-amber-50/80 via-orange-50/50 to-yellow-50/30 dark:border-dark-700 dark:from-amber-900/20 dark:via-orange-900/10 dark:to-yellow-900/5'
-                : 'border-gray-100 bg-gradient-to-br from-blue-50/80 via-indigo-50/50 to-purple-50/30 dark:border-dark-700 dark:from-blue-900/20 dark:via-indigo-900/10 dark:to-purple-900/5'"
-            >
-              <div
-                class="absolute right-0 top-0 h-full w-64 bg-gradient-to-l to-transparent"
-                :class="selectedNotification.kind === 'update' ? 'from-orange-100/30 dark:from-orange-900/20' : 'from-indigo-100/30 dark:from-indigo-900/20'"
-              ></div>
-              <div
-                class="absolute -right-8 -top-8 h-32 w-32 rounded-full blur-3xl"
-                :class="selectedNotification.kind === 'update' ? 'bg-gradient-to-br from-amber-400/20 to-orange-500/20' : 'bg-gradient-to-br from-blue-400/20 to-indigo-500/20'"
-              ></div>
-              <div
-                class="absolute -left-4 -bottom-4 h-24 w-24 rounded-full blur-2xl"
-                :class="selectedNotification.kind === 'update' ? 'bg-gradient-to-tr from-yellow-400/20 to-amber-500/20' : 'bg-gradient-to-tr from-purple-400/20 to-pink-500/20'"
-              ></div>
+            <!-- Header with Decorative Elements -->
+            <div class="relative overflow-hidden border-b border-gray-100 bg-gradient-to-br from-blue-50/80 via-indigo-50/50 to-purple-50/30 px-8 py-6 dark:border-dark-700 dark:from-blue-900/20 dark:via-indigo-900/10 dark:to-purple-900/5">
+              <!-- Decorative background elements -->
+              <div class="absolute right-0 top-0 h-full w-64 bg-gradient-to-l from-indigo-100/30 to-transparent dark:from-indigo-900/20"></div>
+              <div class="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-gradient-to-br from-blue-400/20 to-indigo-500/20 blur-3xl"></div>
+              <div class="absolute -left-4 -bottom-4 h-24 w-24 rounded-full bg-gradient-to-tr from-purple-400/20 to-pink-500/20 blur-2xl"></div>
 
               <div class="relative z-10 flex items-start justify-between gap-4">
-                <div class="min-w-0 flex-1">
+                <div class="flex-1 min-w-0">
+                  <!-- Icon and Category -->
                   <div class="mb-3 flex items-center gap-2">
-                    <div
-                      class="flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-lg"
-                      :class="selectedNotification.kind === 'update'
-                        ? 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-amber-500/30'
-                        : 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-blue-500/30'"
-                    >
-                      <svg
-                        v-if="selectedNotification.kind === 'update'"
-                        class="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                      </svg>
-                      <svg
-                        v-else
-                        class="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/30">
+                      <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
                     <div class="flex items-center gap-2">
-                      <span
-                        class="rounded-lg px-2.5 py-1 text-xs font-medium"
-                        :class="selectedNotification.kind === 'update'
-                          ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
-                          : 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'"
-                      >
-                        {{ getKindLabel(selectedNotification) }}
+                      <span class="rounded-lg bg-blue-100 px-2.5 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                        {{ t('announcements.title') }}
                       </span>
                       <span
-                        v-if="!selectedNotification.read_at"
-                        class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium text-white shadow-lg"
-                        :class="selectedNotification.kind === 'update'
-                          ? 'bg-gradient-to-r from-amber-500 to-orange-600 shadow-amber-500/30'
-                          : 'bg-gradient-to-r from-blue-500 to-indigo-600 shadow-blue-500/30'"
+                        v-if="!selectedAnnouncement.read_at"
+                        class="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-600 px-2.5 py-1 text-xs font-medium text-white shadow-lg shadow-blue-500/30"
                       >
                         <span class="relative flex h-2 w-2">
                           <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75"></span>
@@ -280,27 +223,30 @@
                     </div>
                   </div>
 
+                  <!-- Title -->
                   <h2 class="mb-3 text-2xl font-bold leading-tight text-gray-900 dark:text-white">
-                    {{ selectedNotification.title }}
+                    {{ selectedAnnouncement.title }}
                   </h2>
 
+                  <!-- Meta Info -->
                   <div class="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                     <div class="flex items-center gap-1.5">
                       <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <time>{{ formatRelativeWithDateTime(selectedNotification.created_at) }}</time>
+                      <time>{{ formatRelativeWithDateTime(selectedAnnouncement.created_at) }}</time>
                     </div>
                     <div class="flex items-center gap-1.5">
                       <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
-                      <span>{{ selectedNotification.read_at ? t('announcements.read') : t('announcements.unread') }}</span>
+                      <span>{{ selectedAnnouncement.read_at ? t('announcements.read') : t('announcements.unread') }}</span>
                     </div>
                   </div>
                 </div>
 
+                <!-- Close button -->
                 <button
                   @click="closeDetail"
                   class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white/50 text-gray-500 backdrop-blur-sm transition-all hover:bg-white hover:text-gray-700 hover:shadow-lg dark:bg-dark-700/50 dark:text-gray-400 dark:hover:bg-dark-700 dark:hover:text-gray-300"
@@ -311,31 +257,30 @@
               </div>
             </div>
 
+            <!-- Body with Enhanced Markdown -->
             <div class="max-h-[60vh] overflow-y-auto bg-white px-8 py-8 dark:bg-dark-800">
+              <!-- Content with decorative border -->
               <div class="relative">
-                <div
-                  class="absolute bottom-0 left-0 top-0 w-1 rounded-full"
-                  :class="selectedNotification.kind === 'update'
-                    ? 'bg-gradient-to-b from-amber-500 via-orange-500 to-yellow-500'
-                    : 'bg-gradient-to-b from-blue-500 via-indigo-500 to-purple-500'"
-                ></div>
+                <!-- Decorative left border -->
+                <div class="absolute left-0 top-0 bottom-0 w-1 rounded-full bg-gradient-to-b from-blue-500 via-indigo-500 to-purple-500"></div>
 
                 <div class="pl-6">
                   <div
                     class="markdown-body prose prose-sm max-w-none dark:prose-invert"
-                    v-html="renderMarkdown(selectedNotification.content)"
+                    v-html="renderMarkdown(selectedAnnouncement.content)"
                   ></div>
                 </div>
               </div>
             </div>
 
+            <!-- Footer with Actions -->
             <div class="border-t border-gray-100 bg-gray-50/50 px-8 py-5 dark:border-dark-700 dark:bg-dark-900/30">
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                   <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span>{{ selectedNotification.read_at ? getReadHint(selectedNotification) : getUnreadHint(selectedNotification) }}</span>
+                  <span>{{ selectedAnnouncement.read_at ? t('announcements.readStatus') : t('announcements.markReadHint') }}</span>
                 </div>
                 <div class="flex items-center gap-3">
                   <button
@@ -345,12 +290,9 @@
                     {{ t('common.close') }}
                   </button>
                   <button
-                    v-if="!selectedNotification.read_at"
-                    @click="markAsReadAndClose(selectedNotification)"
-                    class="rounded-xl px-5 py-2.5 text-sm font-medium text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
-                    :class="selectedNotification.kind === 'update'
-                      ? 'bg-gradient-to-r from-amber-500 to-orange-600 shadow-amber-500/30'
-                      : 'bg-gradient-to-r from-blue-600 to-indigo-600 shadow-blue-500/30'"
+                    v-if="!selectedAnnouncement.read_at"
+                    @click="markAsReadAndClose(selectedAnnouncement.id)"
+                    class="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-lg shadow-blue-500/30 transition-all hover:shadow-xl hover:scale-105"
                   >
                     <span class="flex items-center gap-2">
                       <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -375,161 +317,36 @@ import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
-import { useAppStore, useAuthStore, useAdminUpdateNoticeStore } from '@/stores'
+import { useAppStore } from '@/stores/app'
 import { useAnnouncementStore } from '@/stores/announcements'
 import { formatRelativeTime, formatRelativeWithDateTime } from '@/utils/format'
+import type { UserAnnouncement } from '@/types'
 import Icon from '@/components/icons/Icon.vue'
-
-interface NotificationItem {
-  id: string
-  kind: 'announcement' | 'update'
-  title: string
-  content: string
-  created_at: string
-  updated_at: string
-  read_at?: string
-  announcementId?: number
-}
 
 const { t } = useI18n()
 const appStore = useAppStore()
-const authStore = useAuthStore()
 const announcementStore = useAnnouncementStore()
-const adminUpdateNoticeStore = useAdminUpdateNoticeStore()
 
+// Configure marked
 marked.setOptions({
   breaks: true,
   gfm: true,
 })
 
-const { announcements } = storeToRefs(announcementStore)
+// Use store state (storeToRefs for reactivity)
+const { announcements, loading } = storeToRefs(announcementStore)
+const unreadCount = computed(() => announcementStore.unreadCount)
 
-const loading = computed(
-  () => announcementStore.loading || (authStore.isAdmin && adminUpdateNoticeStore.loading)
-)
-
-const updateNotification = computed<NotificationItem | null>(() => {
-  if (!adminUpdateNoticeStore.shouldShowNotice) {
-    return null
-  }
-
-  const currentVersion = adminUpdateNoticeStore.currentVersion || appStore.siteVersion || '--'
-  const latestVersion = adminUpdateNoticeStore.latestVersion || '--'
-  const publishedAt =
-    adminUpdateNoticeStore.releaseInfo?.published_at ||
-    adminUpdateNoticeStore.lastCheckedAt ||
-    new Date(0).toISOString()
-  const releaseUrl = adminUpdateNoticeStore.releaseInfo?.html_url
-  const lines = [
-    `- ${t('announcements.currentVersionLabel')}: \`v${currentVersion}\``,
-    `- ${t('announcements.latestVersionLabel')}: \`v${latestVersion}\``,
-    '',
-    adminUpdateNoticeStore.buildType === 'release'
-      ? t('announcements.updateReleaseHint')
-      : t('announcements.updateSourceHint'),
-  ]
-
-  if (releaseUrl && releaseUrl !== '#') {
-    lines.push('', `[${t('announcements.viewReleaseNotes')}](${releaseUrl})`)
-  }
-
-  return {
-    id: `update-${latestVersion}`,
-    kind: 'update',
-    title: t('announcements.updateAvailableTitle', { version: latestVersion }),
-    content: lines.join('\n'),
-    created_at: publishedAt,
-    updated_at: publishedAt,
-    read_at: adminUpdateNoticeStore.readAt,
-  }
-})
-
-const notificationItems = computed<NotificationItem[]>(() => {
-  const items: NotificationItem[] = announcements.value.map((announcement) => ({
-    id: `announcement-${announcement.id}`,
-    kind: 'announcement',
-    title: announcement.title,
-    content: announcement.content,
-    created_at: announcement.created_at,
-    updated_at: announcement.updated_at,
-    read_at: announcement.read_at,
-    announcementId: announcement.id,
-  }))
-
-  if (updateNotification.value) {
-    items.push(updateNotification.value)
-  }
-
-  return items.sort(
-    (left, right) =>
-      new Date(right.created_at).getTime() - new Date(left.created_at).getTime()
-  )
-})
-
-const unreadCount = computed(
-  () => announcementStore.unreadCount + (adminUpdateNoticeStore.hasUnreadNotice ? 1 : 0)
-)
-
+// Local modal state
 const isModalOpen = ref(false)
 const detailModalOpen = ref(false)
-const selectedNotificationId = ref<string | null>(null)
+const selectedAnnouncement = ref<UserAnnouncement | null>(null)
 
-const selectedNotification = computed(() =>
-  notificationItems.value.find((item) => item.id === selectedNotificationId.value) || null
-)
-
+// Methods
 function renderMarkdown(content: string): string {
   if (!content) return ''
   const html = marked.parse(content) as string
   return DOMPurify.sanitize(html)
-}
-
-function getKindLabel(item: NotificationItem): string {
-  return item.kind === 'update' ? t('announcements.updateLabel') : t('announcements.title')
-}
-
-function getKindBadgeClasses(item: NotificationItem): string {
-  return item.kind === 'update'
-    ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
-    : 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
-}
-
-function getUnreadBadgeClasses(item: NotificationItem): string {
-  return item.kind === 'update'
-    ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
-    : 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
-}
-
-function getUnreadIconClasses(item: NotificationItem): string {
-  return item.kind === 'update'
-    ? 'bg-gradient-to-br from-amber-500 to-orange-600 shadow-amber-500/30'
-    : 'bg-gradient-to-br from-blue-500 to-indigo-600 shadow-blue-500/30'
-}
-
-function getUnreadPulseClasses(item: NotificationItem): string {
-  return item.kind === 'update' ? 'bg-amber-400' : 'bg-blue-400'
-}
-
-function getRowClasses(item: NotificationItem): string {
-  if (item.read_at) {
-    return ''
-  }
-
-  return item.kind === 'update'
-    ? 'bg-amber-50/40 dark:bg-amber-900/5'
-    : 'bg-blue-50/30 dark:bg-blue-900/5'
-}
-
-function getUnreadHint(item: NotificationItem): string {
-  return item.kind === 'update'
-    ? t('announcements.updateMarkReadHint')
-    : t('announcements.markReadHint')
-}
-
-function getReadHint(item: NotificationItem): string {
-  return item.kind === 'update'
-    ? t('announcements.updateReadStatus')
-    : t('announcements.readStatus')
 }
 
 function openModal() {
@@ -540,48 +357,36 @@ function closeModal() {
   isModalOpen.value = false
 }
 
-function closeDetail() {
-  detailModalOpen.value = false
-  selectedNotificationId.value = null
+function openDetail(announcement: UserAnnouncement) {
+  selectedAnnouncement.value = announcement
+  detailModalOpen.value = true
+  if (!announcement.read_at) {
+    markAsRead(announcement.id)
+  }
 }
 
-async function markNotificationAsRead(item: NotificationItem) {
-  try {
-    if (item.kind === 'update') {
-      adminUpdateNoticeStore.markAsRead()
-      return
-    }
+function closeDetail() {
+  detailModalOpen.value = false
+  selectedAnnouncement.value = null
+}
 
-    if (item.announcementId) {
-      await announcementStore.markAsRead(item.announcementId)
-    }
+async function markAsRead(id: number) {
+  try {
+    await announcementStore.markAsRead(id)
   } catch (err: any) {
     appStore.showError(err?.message || t('common.unknownError'))
   }
 }
 
-function openDetail(item: NotificationItem) {
-  selectedNotificationId.value = item.id
-  detailModalOpen.value = true
-  if (!item.read_at) {
-    markNotificationAsRead(item)
-  }
-}
-
-async function markAsReadAndClose(item: NotificationItem) {
-  await markNotificationAsRead(item)
+async function markAsReadAndClose(id: number) {
+  await markAsRead(id)
   appStore.showSuccess(t('announcements.markedAsRead'))
   closeDetail()
 }
 
 async function markAllAsRead() {
   try {
-    if (announcementStore.unreadCount > 0) {
-      await announcementStore.markAllAsRead()
-    }
-    if (adminUpdateNoticeStore.hasUnreadNotice) {
-      adminUpdateNoticeStore.markAsRead()
-    }
+    await announcementStore.markAllAsRead()
     appStore.showSuccess(t('announcements.allMarkedAsRead'))
   } catch (err: any) {
     appStore.showError(err?.message || t('common.unknownError'))
@@ -600,9 +405,6 @@ function handleEscape(e: KeyboardEvent) {
 
 onMounted(() => {
   document.addEventListener('keydown', handleEscape)
-  if (authStore.isAdmin) {
-    adminUpdateNoticeStore.fetchNotice()
-  }
 })
 
 onBeforeUnmount(() => {
@@ -610,16 +412,10 @@ onBeforeUnmount(() => {
   document.body.style.overflow = ''
 })
 
-watch(selectedNotification, (item) => {
-  if (!item && detailModalOpen.value) {
-    closeDetail()
-  }
-})
-
 watch(
   [isModalOpen, detailModalOpen, () => announcementStore.currentPopup],
   ([modal, detail, popup]) => {
-    document.body.style.overflow = modal || detail || popup ? 'hidden' : ''
+    document.body.style.overflow = (modal || detail || popup) ? 'hidden' : ''
   }
 )
 </script>
