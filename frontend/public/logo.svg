@@ -1,0 +1,22 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="yesyeah-flame" x1="44" y1="36" x2="212" y2="220" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FB923C" />
+      <stop offset="0.55" stop-color="#E84D1A" />
+      <stop offset="1" stop-color="#DC2626" />
+    </linearGradient>
+    <linearGradient id="yesyeah-glow" x1="58" y1="28" x2="188" y2="214" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FDBA74" stop-opacity="0.95" />
+      <stop offset="1" stop-color="#E84D1A" stop-opacity="0.2" />
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="64" fill="#0F172A" />
+  <rect x="18" y="18" width="220" height="220" rx="46" stroke="rgba(248,250,252,0.08)" stroke-width="2" />
+  <circle cx="190" cy="58" r="44" fill="url(#yesyeah-glow)" />
+  <circle cx="66" cy="198" r="52" fill="url(#yesyeah-glow)" opacity="0.55" />
+  <path d="M62 62L93 106L124 62" stroke="url(#yesyeah-flame)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M93 106V178" stroke="url(#yesyeah-flame)" stroke-width="22" stroke-linecap="round" />
+  <path d="M132 62L163 106L194 62" stroke="url(#yesyeah-flame)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M163 106V178" stroke="url(#yesyeah-flame)" stroke-width="22" stroke-linecap="round" />
+  <path d="M51 200H205" stroke="rgba(248,250,252,0.12)" stroke-width="6" stroke-linecap="round" />
+</svg>

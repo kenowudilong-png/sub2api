@@ -1,0 +1,53 @@
+# YesYeah landing + Sub2API console routing example
+# Merge carefully with the live site config instead of replacing it wholesale.
+
+root /var/www/yesyeah-landing;
+index index.html;
+
+location = / {
+    try_files /index.html =404;
+}
+
+location ^~ /landing-assets/ {
+    try_files $uri =404;
+    expires 1y;
+    add_header Cache-Control "public, max-age=31536000, immutable";
+}
+
+# Optional: keep landing-owned icon files separate from console assets.
+location = /favicon.svg {
+    try_files /favicon.svg =404;
+}
+
+# Sub2API embedded frontend static assets
+location ^~ /assets/ {
+    proxy_pass http://127.0.0.1:8080;
+}
+
+# Sub2API public/auth pages
+location = /login { proxy_pass http://127.0.0.1:8080; }
+location = /register { proxy_pass http://127.0.0.1:8080; }
+location = /forgot-password { proxy_pass http://127.0.0.1:8080; }
+location = /reset-password { proxy_pass http://127.0.0.1:8080; }
+location = /email-verify { proxy_pass http://127.0.0.1:8080; }
+location = /dashboard { proxy_pass http://127.0.0.1:8080; }
+location = /keys { proxy_pass http://127.0.0.1:8080; }
+location = /usage { proxy_pass http://127.0.0.1:8080; }
+location = /redeem { proxy_pass http://127.0.0.1:8080; }
+location = /profile { proxy_pass http://127.0.0.1:8080; }
+location = /subscriptions { proxy_pass http://127.0.0.1:8080; }
+location = /purchase { proxy_pass http://127.0.0.1:8080; }
+location = /key-usage { proxy_pass http://127.0.0.1:8080; }
+
+location ^~ /auth/ { proxy_pass http://127.0.0.1:8080; }
+location ^~ /admin/ { proxy_pass http://127.0.0.1:8080; }
+location ^~ /custom/ { proxy_pass http://127.0.0.1:8080; }
+location ^~ /setup/ { proxy_pass http://127.0.0.1:8080; }
+
+# Sub2API API endpoints
+location ^~ /api/ { proxy_pass http://127.0.0.1:8080; }
+location ^~ /v1/ { proxy_pass http://127.0.0.1:8080; }
+location ^~ /v1beta/ { proxy_pass http://127.0.0.1:8080; }
+location ^~ /responses/ { proxy_pass http://127.0.0.1:8080; }
+location ^~ /antigravity/ { proxy_pass http://127.0.0.1:8080; }
+location = /health { proxy_pass http://127.0.0.1:8080; }

@@ -4275,12 +4275,12 @@ onMounted(() => {
 
 .settings-tab-active {
   @apply text-primary-600 dark:text-primary-400;
-  background: linear-gradient(135deg, rgba(20, 184, 166, 0.08), rgba(20, 184, 166, 0.03));
-  box-shadow: 0 1px 2px rgba(20, 184, 166, 0.1);
+  background: linear-gradient(135deg, rgba(232, 77, 26, 0.1), rgba(232, 77, 26, 0.04));
+  box-shadow: 0 1px 2px rgba(232, 77, 26, 0.12);
 }
 
 :root.dark .settings-tab-active {
-  background: linear-gradient(135deg, rgba(45, 212, 191, 0.12), rgba(45, 212, 191, 0.05));
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.12), rgba(232, 77, 26, 0.06));
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
 }
 
@@ -4290,7 +4290,7 @@ onMounted(() => {
 }
 
 .settings-tab-active .settings-tab-icon {
-  @apply bg-primary-500/15 text-primary-600
-         dark:bg-primary-400/15 dark:text-primary-400;
+  @apply bg-primary-500/20 text-primary-600
+         dark:bg-primary-400/20 dark:text-primary-400;
 }
 </style>

@@ -331,18 +331,18 @@ const enableRankingView = computed(() => props.enableRankingView)
 const activeView = ref<'model_distribution' | 'spending_ranking'>('model_distribution')
 
 const chartColors = [
-  '#3b82f6',
-  '#10b981',
-  '#f59e0b',
-  '#ef4444',
-  '#8b5cf6',
-  '#ec4899',
-  '#14b8a6',
-  '#f97316',
-  '#6366f1',
-  '#84cc16',
-  '#06b6d4',
-  '#a855f7'
+  '#E84D1A',
+  '#FB923C',
+  '#DC2626',
+  '#FBBF24',
+  '#22C55E',
+  '#F97316',
+  '#FDBA74',
+  '#94A3B8',
+  '#B91C1C',
+  '#EA580C',
+  '#FB7185',
+  '#F59E0B'
 ]
 
 const displayModelStats = computed(() => {

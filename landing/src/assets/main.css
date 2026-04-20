@@ -1,0 +1,477 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    --bg: #06070b;
+    --panel: rgba(15, 23, 42, 0.74);
+    --panel-strong: rgba(17, 23, 41, 0.94);
+    --line: rgba(255, 255, 255, 0.08);
+    --line-strong: rgba(232, 77, 26, 0.28);
+    --text-main: #f1f4fb;
+    --text-soft: #b4c0d5;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    background:
+      radial-gradient(circle at top, rgba(232, 77, 26, 0.14), transparent 28%),
+      linear-gradient(180deg, #08101d 0%, #06070b 42%, #05060a 100%);
+    color: var(--text-main);
+    font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    font-kerning: normal;
+    font-optical-sizing: auto;
+    line-height: 1.8;
+    letter-spacing: 0.008em;
+    line-break: loose;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button,
+  input,
+  textarea {
+    font: inherit;
+  }
+
+  ::selection {
+    background: rgba(232, 77, 26, 0.4);
+    color: #fff;
+  }
+}
+
+@layer components {
+  .app-shell {
+    @apply relative min-h-screen overflow-hidden;
+  }
+
+  .noise-layer,
+  .grid-layer,
+  .backdrop-glow {
+    @apply pointer-events-none fixed inset-0;
+  }
+
+  .noise-layer {
+    opacity: 0.15;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.06) 0.8px, transparent 0.8px),
+      radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.045) 0.8px, transparent 0.8px),
+      radial-gradient(circle at 40% 80%, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 160px 160px, 220px 220px, 190px 190px;
+    mix-blend-mode: screen;
+  }
+
+  .grid-layer {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    background-size: 92px 92px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.62) 0%, transparent 85%);
+  }
+
+  .backdrop-glow {
+    filter: blur(120px);
+    opacity: 0.5;
+    animation: drift 14s ease-in-out infinite alternate;
+  }
+
+  .backdrop-glow--primary {
+    left: -10%;
+    top: -4%;
+    width: 24rem;
+    height: 24rem;
+    background: rgba(232, 77, 26, 0.22);
+  }
+
+  .backdrop-glow--secondary {
+    right: -8%;
+    top: 18%;
+    width: 18rem;
+    height: 18rem;
+    background: rgba(255, 179, 107, 0.12);
+    animation-duration: 18s;
+  }
+
+  .section-shell {
+    @apply mx-auto w-full max-w-7xl px-6 sm:px-8 lg:px-10;
+  }
+
+  .section-header {
+    @apply max-w-[44rem];
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-medium text-ink-500;
+    letter-spacing: 0.14em;
+  }
+
+  .eyebrow-pill {
+    @apply inline-flex items-center rounded-full border px-3 py-1.5 text-[11px] font-medium text-ember-400;
+    letter-spacing: 0.12em;
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .section-title {
+    @apply mt-5 max-w-[40rem] font-display text-[2.5rem] font-semibold text-ink-100 sm:text-[3.35rem];
+    line-height: 1.38;
+    letter-spacing: 0.008em;
+    text-wrap: balance;
+  }
+
+  .section-copy {
+    @apply mt-6 max-w-[38rem] text-[1.03rem] text-ink-300;
+    line-height: 2.02;
+    letter-spacing: 0.008em;
+    text-wrap: pretty;
+  }
+
+  .hero-title {
+    @apply max-w-[11.5em] font-display text-[3.05rem] font-semibold text-ink-100 sm:text-[4.85rem];
+    line-height: 1.26;
+    letter-spacing: 0.008em;
+    text-wrap: balance;
+  }
+
+  .hero-title__accent {
+    @apply mt-2 block text-gradient;
+  }
+
+  .hero-copy {
+    @apply mt-7 max-w-[35rem] text-[1.08rem] text-ink-300 sm:text-[1.14rem];
+    line-height: 2.04;
+    letter-spacing: 0.008em;
+    text-wrap: pretty;
+  }
+
+  .hero-metrics {
+    @apply mt-16 grid gap-8 border-t pt-8 sm:grid-cols-3;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  .text-gradient {
+    background: linear-gradient(120deg, #f1f4fb 10%, #ffbb78 45%, #e84d1a 85%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .btn {
+    @apply inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ember-400;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-primary {
+    @apply bg-primary-500 text-white shadow-ember hover:-translate-y-0.5 hover:bg-primary-400;
+  }
+
+  .btn-secondary {
+    @apply border text-ink-200;
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .btn-secondary:hover {
+    border-color: rgba(232, 77, 26, 0.4);
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+
+  .glass-panel {
+    background:
+      linear-gradient(180deg, rgba(17, 23, 41, 0.92) 0%, rgba(9, 13, 24, 0.9) 100%),
+      linear-gradient(120deg, rgba(255, 255, 255, 0.08), transparent 40%);
+    box-shadow: 0 28px 80px rgba(5, 8, 18, 0.4);
+  }
+
+  .brand-mark {
+    @apply relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-primary-500/40 bg-gradient-to-br from-primary-500/20 via-primary-500/5 to-transparent text-sm font-display font-semibold text-white shadow-ember;
+  }
+
+  .brand-mark::before {
+    content: '';
+    @apply absolute inset-[5px] rounded-[0.9rem] border;
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .mobile-toggle {
+    @apply inline-flex h-11 w-11 flex-col items-center justify-center gap-[0.28rem] rounded-full border text-white;
+    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .mobile-toggle span {
+    @apply block h-px w-5 bg-current;
+  }
+
+  .hero-terminal {
+    @apply relative overflow-hidden rounded-[2rem] shadow-float;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(11, 16, 32, 0.86);
+  }
+
+  .hero-terminal__top {
+    @apply flex items-center justify-between px-5 py-4;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .dot {
+    @apply h-2.5 w-2.5 rounded-full;
+  }
+
+  .terminal-label {
+    @apply text-[11px] font-medium text-ink-500;
+    letter-spacing: 0.12em;
+  }
+
+  .terminal-card {
+    @apply rounded-[1.35rem] p-4;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .route-row {
+    @apply flex items-center justify-between gap-4 rounded-2xl px-4 py-3 font-mono text-xs text-ink-300;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .orb {
+    @apply pointer-events-none absolute rounded-full blur-[70px];
+  }
+
+  .orb-large {
+    left: -4rem;
+    top: 2rem;
+    width: 10rem;
+    height: 10rem;
+    background: rgba(232, 77, 26, 0.2);
+  }
+
+  .orb-small {
+    bottom: 2rem;
+    right: -2rem;
+    width: 7rem;
+    height: 7rem;
+    background: rgba(255, 179, 107, 0.12);
+  }
+
+  .feature-card,
+  .monitor-hero-card,
+  .monitor-summary-panel,
+  .monitor-list-card,
+  .tool-card,
+  .plan-card {
+    @apply glass-panel rounded-[1.75rem] p-7;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .feature-card {
+    @apply h-full transition-transform duration-300 hover:-translate-y-1;
+  }
+
+  .feature-symbol {
+    @apply inline-flex h-14 min-w-[3.5rem] items-center justify-center rounded-2xl px-4 text-[1.45rem] text-ember-400;
+    line-height: 1;
+    border: 1px solid rgba(232, 77, 26, 0.24);
+    background: rgba(232, 77, 26, 0.12);
+  }
+
+  .feature-index {
+    @apply rounded-full px-3 py-1 text-xs text-ink-500;
+    letter-spacing: 0.1em;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .feature-bullet {
+    @apply mt-8 rounded-[1.15rem] px-4 py-4 text-sm text-ink-400;
+    line-height: 1.9;
+    letter-spacing: 0.008em;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .monitor-hero-card {
+    background:
+      linear-gradient(160deg, rgba(232, 77, 26, 0.18) 0%, rgba(17, 23, 41, 0.92) 32%, rgba(8, 12, 22, 0.94) 100%),
+      linear-gradient(120deg, rgba(255, 255, 255, 0.07), transparent 42%);
+    box-shadow:
+      0 32px 90px rgba(5, 8, 18, 0.44),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .monitor-summary-panel {
+    @apply h-full;
+    background:
+      linear-gradient(180deg, rgba(11, 16, 32, 0.96) 0%, rgba(7, 10, 18, 0.94) 100%),
+      linear-gradient(120deg, rgba(255, 255, 255, 0.06), transparent 40%);
+  }
+
+  .monitor-badge {
+    @apply inline-flex items-center rounded-full px-4 py-2 text-[11px] font-semibold text-ember-400;
+    letter-spacing: 0.12em;
+    border: 1px solid rgba(232, 77, 26, 0.26);
+    background: rgba(232, 77, 26, 0.12);
+  }
+
+  .monitor-signal-card {
+    @apply rounded-[1.35rem] p-5;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .monitor-signal-value {
+    @apply font-display text-[2.1rem] font-semibold leading-none text-ember-400;
+    letter-spacing: 0.01em;
+  }
+
+  .monitor-step-row {
+    @apply flex items-start gap-4 rounded-[1.25rem] p-4;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(255, 255, 255, 0.035);
+  }
+
+  .monitor-step-index {
+    @apply inline-flex h-11 min-w-[2.75rem] items-center justify-center rounded-2xl px-3 text-xs font-semibold text-ember-400;
+    letter-spacing: 0.1em;
+    border: 1px solid rgba(232, 77, 26, 0.24);
+    background: rgba(232, 77, 26, 0.12);
+  }
+
+  .monitor-list-card {
+    @apply h-full;
+  }
+
+  .monitor-list-card--alert {
+    box-shadow:
+      0 0 0 1px rgba(232, 77, 26, 0.12),
+      0 26px 70px rgba(5, 8, 18, 0.36);
+  }
+
+  .monitor-list-item {
+    @apply rounded-[1.15rem] px-4 py-4 text-sm text-ink-300;
+    line-height: 1.92;
+    letter-spacing: 0.008em;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .tool-monogram {
+    @apply inline-flex h-16 w-16 items-center justify-center rounded-[1.35rem] font-display text-xl font-semibold text-ember-400;
+    border: 1px solid rgba(232, 77, 26, 0.3);
+    background: rgba(232, 77, 26, 0.1);
+  }
+
+  .copy-chip {
+    @apply inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium text-ink-300 transition-colors hover:text-white;
+    letter-spacing: 0.08em;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .copy-chip:hover {
+    border-color: rgba(232, 77, 26, 0.3);
+  }
+
+  .price-table {
+    @apply w-full border-collapse text-left;
+  }
+
+  .price-table thead th {
+    @apply px-5 py-4 text-xs font-medium text-ink-500;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .price-table tbody td {
+    @apply px-5 py-4 text-sm leading-8 tracking-[0.01em] text-ink-300;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .price-table tbody tr:nth-child(even) {
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .price-chip {
+    @apply inline-flex rounded-full px-3 py-1 text-xs font-semibold text-ember-400;
+    letter-spacing: 0.08em;
+    border: 1px solid rgba(232, 77, 26, 0.24);
+    background: rgba(232, 77, 26, 0.12);
+  }
+
+  .plan-card {
+    @apply h-full;
+  }
+
+  .plan-card--featured {
+    border-color: rgba(232, 77, 26, 0.26);
+    box-shadow:
+      0 0 0 1px rgba(232, 77, 26, 0.18),
+      0 30px 80px rgba(5, 8, 18, 0.45),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .badge-pill {
+    @apply rounded-full px-3 py-1 text-[11px] font-semibold text-ember-400;
+    letter-spacing: 0.1em;
+    border: 1px solid rgba(251, 111, 43, 0.4);
+    background: rgba(232, 77, 26, 0.12);
+  }
+
+  .plan-bullet {
+    @apply rounded-2xl px-4 py-3 text-sm text-ink-300;
+    line-height: 1.88;
+    letter-spacing: 0.008em;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .reveal-block {
+    opacity: 1;
+    transform: none;
+  }
+
+  .reveal-ready {
+    opacity: 0;
+    transform: translateY(26px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s cubic-bezier(0.2, 1, 0.32, 1);
+  }
+
+  .reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .price-table {
+    font-size: 0.85rem;
+  }
+
+  .hero-title {
+    letter-spacing: 0.008em;
+  }
+
+  .section-title {
+    letter-spacing: 0.008em;
+  }
+}
