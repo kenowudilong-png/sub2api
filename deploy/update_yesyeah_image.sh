@@ -31,8 +31,13 @@ if [[ -n "${PREVIOUS_IMAGE_ID}" ]]; then
   echo "Saved rollback image as ${ROLLBACK_TAG}"
 fi
 
-echo "Pulling ${SUB2API_IMAGE}"
-docker compose -f "${COMPOSE_FILE}" pull "${SERVICE_NAME}"
+if [[ "${SUB2API_IMAGE}" == */* ]]; then
+  echo "Pulling ${SUB2API_IMAGE}"
+  docker compose -f "${COMPOSE_FILE}" pull "${SERVICE_NAME}"
+else
+  echo "Using local image ${SUB2API_IMAGE}; skipping pull"
+  docker image inspect "${SUB2API_IMAGE}" >/dev/null
+fi
 
 echo "Recreating ${SERVICE_NAME}"
 docker compose -f "${COMPOSE_FILE}" up -d "${SERVICE_NAME}"
