@@ -18,6 +18,40 @@ export type FeatureItem = {
   bullet: string
 }
 
+export type QuotaMonitorSignal = {
+  value: string
+  label: string
+  detail: string
+}
+
+export type QuotaMonitorCapability = {
+  capability: string
+  current: string
+  withMonitor: string
+}
+
+export type QuotaMonitorStep = {
+  id: string
+  title: string
+  detail: string
+}
+
+export type QuotaMonitorContent = {
+  eyebrow: string
+  title: string
+  summary: string
+  positioning: string
+  ctaLabel: string
+  ctaHref: string
+  note: string
+  signals: QuotaMonitorSignal[]
+  capabilities: QuotaMonitorCapability[]
+  deploymentSteps: QuotaMonitorStep[]
+  initChecklist: string[]
+  securityRules: string[]
+  launchChecklist: string[]
+}
+
 export type ToolItem = {
   name: string
   tag: string
@@ -56,6 +90,7 @@ export type FooterGroup = {
 export const navLinks: NavLink[] = [
   { label: '首页', href: '#hero' },
   { label: '为什么选我们', href: '#features' },
+  { label: '余额监控', href: '#quota-monitor' },
   { label: '快速接入', href: '#tools' },
   { label: '模型与计费', href: '#pricing' },
   { label: '方案与定价', href: '#plans' }
@@ -76,8 +111,8 @@ export const heroMetrics: HeroMetric[] = [
   {
     value: 24,
     suffix: '/7',
-    label: '可用性监控',
-    detail: '请求量、成功率、余额 — 全收进控制台'
+    label: '余额监控',
+    detail: '统一面板、自动签到、趋势告警'
   }
 ]
 
@@ -111,6 +146,98 @@ export const features: FeatureItem[] = [
     bullet: '多上游智能调度 + 失败自动切换 + 粘性会话，把预算花在刀刃上。'
   }
 ]
+
+export const quotaMonitorContent: QuotaMonitorContent = {
+  eyebrow: 'Quota Monitor 专题',
+  title: '在 Sub2API 旁边挂一块余额面板，不改主链路也能把监控补齐',
+  summary:
+    '这不是替换网关，而是给现有运营链路补一层运维视角：统一余额、自动签到、趋势图和异常告警都交给旁挂的 Quota Monitor，Sub2API 继续负责路由、计费和 API 接入。',
+  positioning:
+    '适合已经跑通 `api.yesyeah.xyz`、不想动现网网关、但又需要管理员集中查看渠道状态和额度波动的场景。第一版只承接内容与运行手册，部署动作仍按独立执行链推进。',
+  ctaLabel: '打开监控面板',
+  ctaHref: 'https://monitor.yesyeah.xyz',
+  note: '监控面板是运维入口，不替代现有 Sub2API 控制台与 API 网关。',
+  signals: [
+    {
+      value: '01',
+      label: '统一余额面板',
+      detail: '把 AI 派、Dragon Code、DawCode 等渠道余额集中到一个入口里'
+    },
+    {
+      value: '24/7',
+      label: '自动刷新与签到',
+      detail: '定时刷新状态、自动签到领取额度，减少人工巡检和重复登录'
+    },
+    {
+      value: '6h-90d',
+      label: '趋势与告警',
+      detail: '支持余额趋势、异常波动和 Telegram 推送，方便运营排查'
+    }
+  ],
+  capabilities: [
+    {
+      capability: '余额查询',
+      current: '分别登录每家站点查看，口径分散',
+      withMonitor: '统一面板刷新全部渠道，余额状态集中展示'
+    },
+    {
+      capability: '自动签到',
+      current: '无自动化，靠人工处理',
+      withMonitor: '定时签到、记录奖励历史，适合日常巡检'
+    },
+    {
+      capability: '余额趋势',
+      current: '没有统一沉淀，只能凭感觉回忆',
+      withMonitor: '按 6h / 24h / 7d / 30d / 90d 查看波动趋势'
+    },
+    {
+      capability: '异常告警',
+      current: '问题发生后才被动发现',
+      withMonitor: '余额刷新、消耗异常、签到简报统一进入告警通道'
+    }
+  ],
+  deploymentSteps: [
+    {
+      id: '01',
+      title: '保留现有 Sub2API 路由',
+      detail: '现有 `api.yesyeah.xyz`、用户 API Key、计费和分组配置全部保持原样。'
+    },
+    {
+      id: '02',
+      title: '新增 PostgreSQL + Quota Monitor',
+      detail: '旁挂的 Monitor 只需要自己的数据存储和 providers 信息，不改网关主链路。'
+    },
+    {
+      id: '03',
+      title: '录入渠道与类型定义',
+      detail: '按 NewAPI / Sub2API / AnyRouter 口径补 providers、认证信息和刷新策略。'
+    },
+    {
+      id: '04',
+      title: '打开自动刷新、签到与 Telegram',
+      detail: '把日常运维动作收敛到固定流程，避免人工漏看余额或错过异常。'
+    }
+  ],
+  initChecklist: [
+    '创建 `monitor.yesyeah.xyz` 子域，规划反代到 `127.0.0.1:23010`',
+    '准备 `postgres:16-alpine`、可选 `redis:7-alpine` 与 `quota-monitor` 容器',
+    '用占位符形式维护 `.env`：数据库密码、面板管理员密码、providers 凭据',
+    '启动后先确认 Web UI 是否支持手工添加端点，再决定是否直接写 `providers` 表',
+    '为每个渠道补充认证信息，并验证刷新状态是否返回 `ok`'
+  ],
+  securityRules: [
+    '保持“旁挂、不替换”，不要把 Quota Monitor 误接入现有 API 网关主链路',
+    '所有 API Key、Cookie、JWT、数据库密码都只写占位符，不进仓库、不进公开日志',
+    'Monitor 只暴露管理面板，不暴露上游渠道私密接口与内部凭据',
+    '如果需要 Telegram 推送，先确认 bot token、chat_id 的存储位置和权限边界'
+  ],
+  launchChecklist: [
+    '确认 `monitor.yesyeah.xyz` 能打开登录页，但不以线上可达作为本轮内容开发阻塞',
+    '确认专题中已说明“Sub2API 继续负责路由与计费，Monitor 只做监控”',
+    '确认部署摘要、初始化清单、安全红线、上线检查项都在 landing 中可见',
+    '确认完整运行手册已写入 `sub2api/docs`，且未包含任何真实敏感信息'
+  ]
+}
 
 export const tools: ToolItem[] = [
   {
@@ -226,6 +353,7 @@ export const footerGroups: FooterGroup[] = [
     title: '页面导航',
     links: [
       { label: '为什么选我们', href: '#features' },
+      { label: '余额监控', href: '#quota-monitor' },
       { label: '快速接入', href: '#tools' },
       { label: '模型与计费', href: '#pricing' }
     ]
@@ -242,7 +370,7 @@ export const footerGroups: FooterGroup[] = [
     title: '更多',
     links: [
       { label: '方案与定价', href: '#plans' },
-      { label: '快速接入模板', href: '#tools' },
+      { label: '监控面板', href: 'https://monitor.yesyeah.xyz' },
       { label: '返回顶部', href: '#hero' }
     ]
   }

@@ -59,20 +59,22 @@
     background-attachment: fixed;
   }
 
-  /* 自定义滚动条 - 默认隐藏，悬停或滚动时显示 */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
-  }
+  /* 自定义滚动条 - 仅针对 Firefox，避免 Chrome 取消 webkit 的全局定制 */
+  @supports (-moz-appearance:none) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: transparent transparent;
+    }
 
-  *:hover,
-  *:focus-within {
-    scrollbar-color: var(--yy-scrollbar) transparent;
-  }
+    *:hover,
+    *:focus-within {
+      scrollbar-color: var(--yy-scrollbar) transparent;
+    }
 
-  .dark *:hover,
-  .dark *:focus-within {
-    scrollbar-color: var(--yy-scrollbar) transparent;
+    .dark *:hover,
+    .dark *:focus-within {
+      scrollbar-color: var(--yy-scrollbar) transparent;
+    }
   }
 
   ::-webkit-scrollbar {
@@ -188,6 +190,27 @@
     @apply text-white shadow-md shadow-amber-500/25;
     @apply hover:from-amber-600 hover:to-amber-700 hover:shadow-lg hover:shadow-amber-500/30;
     @apply dark:shadow-amber-500/20;
+  }
+
+  .btn-stripe {
+    @apply bg-[#635bff] text-white shadow-md shadow-[#635bff]/25;
+    @apply hover:bg-[#5851ea] hover:shadow-lg hover:shadow-[#635bff]/30;
+    @apply dark:bg-[#7a73ff] dark:shadow-[#7a73ff]/20;
+    @apply dark:hover:bg-[#635bff];
+  }
+
+  .btn-alipay {
+    @apply bg-[#00AEEF] text-white shadow-md shadow-[#00AEEF]/25;
+    @apply hover:bg-[#009dd6] hover:shadow-lg hover:shadow-[#00AEEF]/30;
+    @apply active:bg-[#008cbe];
+    @apply dark:shadow-[#00AEEF]/20;
+  }
+
+  .btn-wxpay {
+    @apply bg-[#2BB741] text-white shadow-md shadow-[#2BB741]/25;
+    @apply hover:bg-[#24a038] hover:shadow-lg hover:shadow-[#2BB741]/30;
+    @apply active:bg-[#1d8a2f];
+    @apply dark:shadow-[#2BB741]/20;
   }
 
   .btn-sm {
@@ -579,6 +602,7 @@
     @apply flex w-64 flex-col bg-white/95 dark:bg-dark-900;
     @apply border-r border-slate-200 dark:border-white/10;
     @apply transition-transform duration-300;
+    transition-property: width, transform;
     background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.96));
   }
 
@@ -589,6 +613,9 @@
   .sidebar-header {
     @apply h-16 px-6;
     @apply flex items-center gap-3;
+    transition:
+      padding 0.2s ease,
+      gap 0.2s ease;
     @apply border-b border-slate-100 dark:border-white/10;
   }
 
@@ -597,10 +624,13 @@
   }
 
   .sidebar-link {
-    @apply flex items-center gap-3 rounded-xl px-3 py-2.5;
+    @apply flex items-center gap-3 rounded-xl py-2.5;
+    @apply overflow-hidden;
     @apply text-sm font-medium;
     @apply text-slate-600 dark:text-slate-300;
     @apply transition-all duration-200;
+    padding-left: 1.0625rem;
+    padding-right: 0.875rem;
     @apply hover:bg-orange-50/80 dark:hover:bg-white/5;
     @apply hover:text-slate-900 dark:hover:text-white;
   }
